@@ -4,17 +4,47 @@
     <meta charset="UTF-8">
     <title>Weather App</title>
     <style>
-        /* Basic styling */
-        body { font-family: Arial, sans-serif; background: #f4f4f4; text-align: center; }
-        .container { max-width: 500px; margin: 50px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input[type="text"] { padding: 10px; width: 70%; }
-        input[type="submit"] { padding: 10px 20px; }
-        .weather-info { margin-top: 20px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f0f2f5; display: grid; place-items: center; min-height: 90vh; }
+        .container { max-width: 500px; margin: 20px; padding: 25px 30px; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        h2 { text-align: center; color: #333; }
+        form { display: flex; gap: 10px; }
+        input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; }
+        input[type="submit"] { padding: 12px 20px; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+        input[type="submit"]:hover { background: #0056b3; }
+        
+        .weather-info { margin-top: 25px; text-align: center; }
+        .weather-main { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .weather-main p { font-size: 52px; margin: 0; color: #111; }
+        .weather-main div { text-align: left; }
+        .weather-main span { display: block; font-size: 18px; color: #555; }
+        
+        /* --- NEW CSS FOR THE DETAILS GRID --- */
+        .weather-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns */
+            gap: 15px;
+            text-align: left;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .weather-details p {
+            margin: 0;
+            color: #444;
+            font-size: 16px;
+        }
+        .weather-details strong { /* The label (e.g., "Humidity") */
+            display: block;
+            color: #888;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Simple Weather App</h2>
+        <h2>Weather App</h2>
         
         <form method="POST">
             <input type="text" name="city" placeholder="Enter a city name" required>
@@ -25,17 +55,39 @@
             <div class="weather-info">
                 
                 {% if weather.error %}
-                    <p style="color: red;">{{ weather.error }}</p>
+                    <p style="color: red; font-size: 18px;">{{ weather.error }}</p>
 
                 {% else %}
-                    <h3>Weather in {{ weather.location }}</h3>
-                    <p style="font-size: 48px; margin: 10px 0;">{{ weather.temp }}°C</p>
-                    <p>{{ weather.condition }}</p>
-                    <img src="https:{{ weather.icon }}" alt="Weather icon">
+                    <h3>{{ weather.location }}, {{ weather.region }}</h3>
+                    <div class="weather-main">
+                        <img src="https:{{ weather.icon }}" alt="Weather icon">
+                        <div>
+                            <p>{{ weather.temp }}°C</p>
+                            <span>{{ weather.condition }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="weather-details">
+                        <p>
+                            <strong>Feels Like</strong>
+                            {{ weather.feelslike }}°C
+                        </p>
+                        <p>
+                            <strong>Humidity</strong>
+                            {{ weather.humidity }}%
+                        </p>
+                        <p>
+                            <strong>Wind</strong>
+                            {{ weather.wind_kph }} kph ({{ weather.wind_dir }})
+                        </p>
+                        <p>
+                            <strong>Local Time</strong>
+                            {{ weather.localtime.split(' ')[1] }} </p>
+                    </div>
+                    
                 {% endif %}
-                
             </div>
         {% endif %}
     </div>
 </body>
-</html> 
+</html>
