@@ -2,49 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Weather App</title>
+    <title>Advanced Weather App</title>
     <style>
+        /* ... (all your existing CSS from body to .weather-details) ... */
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f0f2f5; display: grid; place-items: center; min-height: 90vh; }
-        .container { max-width: 500px; margin: 20px; padding: 25px 30px; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .container { max-width: 600px; margin: 20px; padding: 25px 30px; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         h2 { text-align: center; color: #333; }
         form { display: flex; gap: 10px; }
         input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; }
         input[type="submit"] { padding: 12px 20px; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
         input[type="submit"]:hover { background: #0056b3; }
         
-        .weather-info { margin-top: 25px; text-align: center; }
-        .weather-main { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .weather-info { margin-top: 25px; }
+        .weather-location { text-align: center; }
+        .weather-main { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; text-align: center; }
         .weather-main p { font-size: 52px; margin: 0; color: #111; }
         .weather-main div { text-align: left; }
         .weather-main span { display: block; font-size: 18px; color: #555; }
         
-        /* --- NEW CSS FOR THE DETAILS GRID --- */
         .weather-details {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* Two columns */
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 16px;
             text-align: left;
             margin-top: 25px;
             padding-top: 20px;
             border-top: 1px solid #eee;
         }
-        .weather-details p {
-            margin: 0;
-            color: #444;
-            font-size: 16px;
+        .weather-details p { margin: 0; color: #444; font-size: 15px; }
+        .weather-details strong { display: block; color: #888; font-size: 13px; font-weight: 600; margin-bottom: 4px; text-transform: uppercase; }
+        
+        .suggestions {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            display: grid;
+            gap: 15px;
         }
-        .weather-details strong { /* The label (e.g., "Humidity") */
-            display: block;
-            color: #888;
+        .suggestion-card { padding: 18px; border-radius: 8px; background: #f9f9f9; border-left: 5px solid; }
+        .suggestion-card h4 { margin: 0 0 8px 0; color: #333; }
+        .suggestion-card p { margin: 0; color: #555; }
+        .card-aqi { border-color: #4CAF50; }
+        .card-clothing { border-color: #2196F3; }
+        .card-activity { border-color: #FF9800; }
+        .aqi-level { font-weight: bold; padding: 2px 6px; border-radius: 4px; color: white; display: inline-block; margin-bottom: 8px; }
+        .aqi-1 { background: #4CAF50; } .aqi-2 { background: #FFEB3B; color: #333; } .aqi-3 { background: #FF9800; }
+        .aqi-4 { background: #F44336; } .aqi-5 { background: #9C27B0; } .aqi-6 { background: #795548; }
+        
+        /* --- NEW CSS FOR THE RAW AQI DETAILS --- */
+        .aqi-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns */
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px dashed #ddd;
+        }
+        .aqi-details p {
             font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
+            color: #333;
         }
+        .aqi-details strong {
+            display: block;
+            font-size: 12px;
+            color: #777;
+            font-weight: 600;
+        }
+        
+        /* ... (rest of your CSS: .forecast-header, .forecast-container, etc) ... */
+        .forecast-header {
+            text-align: center;
+            font-size: 20px;
+            color: #333;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .forecast-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .forecast-day {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: #fdfdfd;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        .forecast-day h4 { margin: 0 0 10px 0; color: #007bff; }
+        .forecast-day img { margin: -5px 0; }
+        .forecast-day .temps { font-weight: bold; color: #333; }
+        .forecast-day .condition { font-size: 14px; color: #777; }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Weather App</h2>
+        <h2>My Advanced Weather App</h2>
         
         <form method="POST">
             <input type="text" name="city" placeholder="Enter a city name" required>
@@ -55,10 +112,12 @@
             <div class="weather-info">
                 
                 {% if weather.error %}
-                    <p style="color: red; font-size: 18px;">{{ weather.error }}</p>
+                    <p style="color: red; font-size: 18px; text-align: center;">{{ weather.error }}</p>
 
                 {% else %}
-                    <h3>{{ weather.location }}, {{ weather.region }}</h3>
+                    <div class="weather-location">
+                        <h3>{{ weather.location }}, {{ weather.region }}</h3>
+                    </div>
                     <div class="weather-main">
                         <img src="https:{{ weather.icon }}" alt="Weather icon">
                         <div>
@@ -68,21 +127,57 @@
                     </div>
                     
                     <div class="weather-details">
-                        <p>
-                            <strong>Feels Like</strong>
-                            {{ weather.feelslike }}°C
-                        </p>
-                        <p>
-                            <strong>Humidity</strong>
-                            {{ weather.humidity }}%
-                        </p>
-                        <p>
-                            <strong>Wind</strong>
-                            {{ weather.wind_kph }} kph ({{ weather.wind_dir }})
-                        </p>
-                        <p>
-                            <strong>Local Time</strong>
-                            {{ weather.localtime.split(' ')[1] }} </p>
+                        <p><strong>Feels Like</strong> {{ weather.feelslike }}°C</p>
+                        <p><strong>Humidity</strong> {{ weather.humidity }}%</p>
+                        <p><strong>Wind</strong> {{ weather.wind_kph }} kph</p>
+                        <p><strong>Visibility</strong> {{ weather.vis_km }} km</p>
+                        <p><strong>Pressure</strong> {{ weather.pressure_mb }} mb</p>
+                        <p><strong>UV Index</strong> {{ weather.uv }}</D>
+                        <p><strong>Sunrise</strong> {{ weather.sunrise }}</p>
+                        <p><strong>Sunset</strong> {{ weather.sunset }}</p>
+                    </div>
+
+                    <h3 class="forecast-header">3-Day Forecast</h3>
+                    <div class="forecast-container">
+                        {% for day in weather.forecast %}
+                        <div class="forecast-day">
+                            <h4>{{ day.day_name }}</h4>
+                            <img src="https:{{ day.icon }}" alt="{{ day.condition }}">
+                            <p class="temps">{{ day.maxtemp }}°C / {{ day.mintemp }}°C</p>
+                            <p class="condition">{{ day.condition }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="suggestions">
+
+                        {% if weather.aqi_index %}
+                        <div class="suggestion-card card-aqi">
+                            <h4>Air Quality</h4>
+                            <span class="aqi-level aqi-{{ weather.aqi_index }}">
+                                {{ weather.aqi_meaning }} (EPA Index: {{ weather.aqi_index }})
+                            </span>
+                            <p>{{ weather.aqi_advice }}</p>
+
+                            <div class="aqi-details">
+                                <p><strong>PM2.5</strong> {{ weather.aqi_pm2_5 | round(1) }} μg/m³</p>
+                                <p><strong>PM10</strong> {{ weather.aqi_pm10 | round(1) }} μg/m³</p>
+                                <p><strong>Ozone (O₃)</strong> {{ weather.aqi_o3 | round(1) }} μg/m³</p>
+                                <p><strong>NO₂</strong> {{ weather.aqi_no2 | round(1) }} μg/m³</p>
+                                <p><strong>SO₂</strong> {{ weather.aqi_so2 | round(1) }} μg/m³</p>
+                                <p><strong>CO</strong> {{ weather.aqi_co | round(1) }} μg/m³</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="suggestion-card card-clothing">
+                            <h4>What to Wear</h4>
+                            <p>{{ weather.clothing_advice }}</p>
+                        </div>
+
+                        <div class="suggestion-card card-activity">
+                            <h4>Activity Suggestion</h4>
+                            <p>{{ weather.activity_suggestion }}</p>
+                        </div>
                     </div>
                     
                 {% endif %}
